@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$ScamBF — Born from the Ashes of FTX | Solana</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #020408;
+  --dark: #060c14;
+  --dark2: #0a1520;
+  --navy: #0d1f35;
+  --blue: #1a4a8a;
+  --electric: #3b82f6;
+  --cyan: #06b6d4;
+  --red: #dc2626;
+  --red2: #ef4444;
+  --orange: #f97316;
+  --gold: #f59e0b;
+  --cream: #fef3c7;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.45);
+  --glow-blue: rgba(59,130,246,0.35);
+  --glow-red: rgba(220,38,38,0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* ─── CANVAS BG ─── */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ─── SCANLINES ─── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 60px;
+  background: rgba(2,4,8,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(59,130,246,0.08);
+  transition: all 0.3s;
+}
+nav.scrolled {
+  padding: 12px 60px;
+  background: rgba(2,4,8,0.97);
+  border-bottom-color: rgba(59,130,246,0.15);
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.nav-logo-img {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(59,130,246,0.5);
+  box-shadow: 0 0 16px var(--glow-blue);
+}
+.nav-logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--white);
+}
+.nav-logo-text span { color: var(--red2); }
+.nav-links {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+.nav-links a {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--cyan); }
+.nav-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black) !important;
+  background: var(--electric);
+  padding: 9px 24px;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.nav-btn:hover {
+  background: var(--cyan);
+  box-shadow: 0 0 24px rgba(6,182,212,0.5);
+}
+
+/* ─── HERO ─── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding-top: 70px;
+}
+
+.hero-banner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.hero-banner img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  display: block;
+  filter: brightness(0.35) saturate(0.8);
+}
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(220,38,38,0.12), transparent 60%),
+    linear-gradient(to bottom, rgba(2,4,8,0.3) 0%, rgba(2,4,8,0) 20%, rgba(2,4,8,0.0) 50%, rgba(2,4,8,1) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 80px 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: flex-end;
+}
+
+.hero-left {}
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.eyebrow-line {
+  width: 40px; height: 1px;
+  background: var(--red2);
+  flex-shrink: 0;
+}
+.eyebrow-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--red2);
+  text-transform: uppercase;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 9vw, 130px);
+  line-height: 0.88;
+  letter-spacing: 2px;
+  margin-bottom: 28px;
+}
+h1 .line1 { display: block; color: var(--white); }
+h1 .line2 { display: block; color: var(--red2); text-shadow: 0 0 40px rgba(239,68,68,0.4); }
+h1 .line3 { display: block; color: var(--electric); text-shadow: 0 0 40px var(--glow-blue); }
+
+.hero-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.6);
+  max-width: 480px;
+  margin-bottom: 40px;
+  border-left: 2px solid rgba(220,38,38,0.5);
+  padding-left: 20px;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black);
+  background: var(--electric);
+  padding: 14px 36px;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-primary:hover {
+  background: var(--cyan);
+  box-shadow: 0 0 32px rgba(6,182,212,0.5);
+  transform: translateY(-2px);
+}
+.btn-ghost {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 14px 36px;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-ghost:hover {
+  border-color: var(--electric);
+  color: var(--electric);
+  box-shadow: 0 0 20px rgba(59,130,246,0.2);
+  transform: translateY(-2px);
+}
+
+/* Hero right — floating logo */
+.hero-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding-bottom: 20px;
+}
+.hero-logo-wrap {
+  position: relative;
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+.hero-logo-circle {
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(59,130,246,0.3);
+  box-shadow:
+    0 0 0 12px rgba(59,130,246,0.04),
+    0 0 60px rgba(59,130,246,0.2),
+    0 0 120px rgba(59,130,246,0.08);
+  position: relative;
+  z-index: 2;
+}
+.hero-logo-circle img { width:100%; height:100%; object-fit:cover; }
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  border: 1px solid rgba(59,130,246,0.1);
+  animation: spin 30s linear infinite;
+}
+.ring1 { width:340px; height:340px; }
+.ring2 { width:420px; height:420px; border-style:dashed; animation-direction:reverse; animation-duration:50s; }
+.ring3 { width:500px; height:500px; border-color: rgba(220,38,38,0.06); animation-duration:70s; }
+@keyframes spin { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+
+/* Hero stats */
+.hero-stats {
+  position: absolute;
+  right: 80px; bottom: 20px;
+  display: flex;
+  gap: 40px;
+  z-index: 2;
+}
+.stat {
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--electric);
+  display: block;
+  line-height: 1;
+}
+.stat-lbl {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ─── SECTION BASE ─── */
+section { position: relative; z-index: 2; }
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--red2);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label.ctr { justify-content: center; }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(220,38,38,0.4), transparent);
+}
+.section-label.ctr::after { display: none; }
+
+h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 0.92;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+h2 .hl { color: var(--red2); }
+h2 .hlb { color: var(--electric); }
+h2 .hlg { color: var(--gold); }
+
+/* ─── DIVIDERS ─── */
+.sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.2), rgba(220,38,38,0.2), transparent);
+  position: relative;
+}
+.sep::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 50%;
+  transform: translateX(-50%);
+  width: 6px; height: 6px;
+  background: var(--electric);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--electric);
+}
+
+/* ─── MANIFESTO ─── */
+#manifesto {
+  padding: 140px 80px;
+  background: linear-gradient(180deg, var(--dark) 0%, #050a10 50%, var(--dark) 100%);
+  overflow: hidden;
+}
+.manifesto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: start;
+}
+.manifesto-left {}
+.manifesto-para {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.58);
+  line-height: 1.9;
+  margin-bottom: 24px;
+}
+.manifesto-para strong { color: var(--cream); font-weight: 400; }
+.manifesto-para em { color: var(--red2); font-style: normal; }
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.tl-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 24px;
+  align-items: start;
+  position: relative;
+}
+.tl-item:not(:last-child) .tl-line {
+  position: absolute;
+  left: 37px;
+  top: 40px;
+  bottom: -20px;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(59,130,246,0.3), rgba(59,130,246,0.05));
+}
+.tl-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-align: right;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.tl-dot {
+  position: absolute;
+  left: 33px;
+  top: 6px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  z-index: 1;
+}
+.tl-dot.red { background: var(--red2); box-shadow: 0 0 10px var(--red2); }
+.tl-dot.blue { background: var(--electric); box-shadow: 0 0 10px var(--electric); }
+.tl-dot.gold { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+.tl-body { padding-bottom: 40px; }
+.tl-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.tl-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Chart area */
+.chart-wrap {
+  background: rgba(10,21,32,0.6);
+  border: 1px solid rgba(59,130,246,0.1);
+  border-radius: 4px;
+  padding: 28px;
+  margin-top: 8px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.chart-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.chart-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  padding: 4px 10px;
+  background: rgba(220,38,38,0.15);
+  border: 1px solid rgba(220,38,38,0.3);
+  color: var(--red2);
+  letter-spacing: 1px;
+  border-radius: 2px;
+}
+.chart-svg { width: 100%; }
+
+/* ─── LORE ─── */
+#lore {
+  padding: 140px 80px;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,21,32,1), var(--black));
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+.lore-bg-text {
+  position: absolute;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(100px,20vw,240px);
+  color: rgba(59,130,246,0.02);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: -4px;
+}
+.lore-quote {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto 60px;
+}
+.lore-quote-mark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 80px;
+  color: rgba(220,38,38,0.2);
+  line-height: 0.5;
+  margin-bottom: 20px;
+  display: block;
+}
+.lore-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 300;
+  font-size: clamp(22px,3vw,40px);
+  line-height: 1.45;
+  color: rgba(254,243,199,0.85);
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+.lore-text .accent-red { color: var(--red2); font-style: normal; font-weight: 600; }
+.lore-text .accent-blue { color: var(--electric); font-style: normal; font-weight: 600; }
+.lore-text .accent-gold { color: var(--gold); font-style: normal; font-weight: 600; }
+
+.pillars {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+.pillar:hover { transform: translateY(-6px); }
+.pillar-icon {
+  width: 60px; height: 60px;
+  border: 1px solid rgba(59,130,246,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: rgba(59,130,246,0.06);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.pillar-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ─── TOKENOMICS ─── */
+#tokenomics {
+  padding: 140px 80px;
+  background: linear-gradient(180deg, var(--black) 0%, var(--dark2) 50%, var(--black) 100%);
+  text-align: center;
+}
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 60px;
+}
+.token-card {
+  background: rgba(6,12,20,0.9);
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.token-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent);
+  transition: opacity 0.2s;
+  opacity: 0;
+}
+.token-card:hover { background: rgba(10,21,32,0.95); }
+.token-card:hover::before { opacity: 1; }
+.token-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 60px;
+  color: var(--electric);
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(59,130,246,0.4);
+}
+.token-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.token-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 200px;
+}
+
+/* ─── HOW TO BUY ─── */
+#buy {
+  padding: 140px 80px;
+  background: var(--black);
+  text-align: center;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 60px;
+  position: relative;
+}
+.step {
+  background: var(--dark);
+  padding: 48px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.step:hover { background: var(--dark2); }
+.step-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 80px;
+  color: rgba(59,130,246,0.06);
+  line-height: 0.9;
+  position: absolute;
+  top: 16px; right: 16px;
+  pointer-events: none;
+  transition: color 0.3s;
+}
+.step:hover .step-num { color: rgba(59,130,246,0.1); }
+.step-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+  display: block;
+}
+.step-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.step-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ─── CA ─── */
+#ca {
+  padding: 100px 80px;
+  background: var(--dark2);
+  text-align: center;
+}
+.ca-wrap {
+  max-width: 700px;
+  margin: 50px auto 0;
+}
+.ca-box {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(2,4,8,0.8);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ca-icon {
+  padding: 16px 20px;
+  background: rgba(59,130,246,0.08);
+  border-right: 1px solid rgba(59,130,246,0.15);
+  font-size: 16px;
+}
+.ca-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  flex: 1;
+  padding: 16px 20px;
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ca-copy {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--electric);
+  background: rgba(59,130,246,0.1);
+  border: none;
+  border-left: 1px solid rgba(59,130,246,0.15);
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ca-copy:hover { background: var(--electric); color: var(--black); }
+.ca-note {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* ─── COMMUNITY ─── */
+#community {
+  padding: 140px 80px;
+  background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(15,30,55,0.6), var(--black) 70%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.community-glow {
+  position: absolute;
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(59,130,246,0.08), transparent);
+  bottom: -100px; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.community-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--muted);
+  margin-top: 16px;
+  margin-bottom: 60px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.social-grid {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.social-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 18px 40px;
+  border-radius: 3px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.social-x {
+  background: var(--white);
+  color: var(--black);
+}
+.social-x:hover {
+  background: var(--cream);
+  box-shadow: 0 0 30px rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+.social-web {
+  background: transparent;
+  color: var(--electric);
+  border: 1px solid rgba(59,130,246,0.4);
+}
+.social-web:hover {
+  border-color: var(--electric);
+  background: rgba(59,130,246,0.1);
+  box-shadow: 0 0 24px rgba(59,130,246,0.2);
+  transform: translateY(-2px);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: rgba(2,4,8,0.98);
+  border-top: 1px solid rgba(59,130,246,0.08);
+  padding: 40px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.foot-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.foot-logo img {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+.foot-logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.3);
+}
+.foot-disclaimer {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.15);
+  max-width: 600px;
+  line-height: 1.7;
+  text-align: right;
+}
+
+/* ─── FADE IN ─── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: none;
+}
+.fade-up-d1 { transition-delay: 0.1s; }
+.fade-up-d2 { transition-delay: 0.2s; }
+.fade-up-d3 { transition-delay: 0.3s; }
+.fade-up-d4 { transition-delay: 0.4s; }
+
+/* ─── GLITCH EFFECT ─── */
+.glitch {
+  position: relative;
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+.glitch::before {
+  color: var(--red2);
+  animation: glitch-1 4s infinite;
+  clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+  left: -2px;
+}
+.glitch::after {
+  color: var(--cyan);
+  animation: glitch-2 4s infinite;
+  clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  left: 2px;
+}
+@keyframes glitch-1 {
+  0%,90%,100% { opacity: 0; }
+  92% { opacity: 1; transform: translateX(-3px); }
+  94% { opacity: 0; }
+  96% { opacity: 1; transform: translateX(2px); }
+  98% { opacity: 0; }
+}
+@keyframes glitch-2 {
+  0%,88%,100% { opacity: 0; }
+  90% { opacity: 1; transform: translateX(3px); }
+  92% { opacity: 0; }
+  94% { opacity: 1; transform: translateX(-2px); }
+  96% { opacity: 0; }
+}
+
+/* ─── COUNTER ─── */
+.number-count {
+  display: inline-block;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  nav { padding: 14px 30px; }
+  .hero-content { padding: 0 30px 80px; gap: 30px; }
+  #manifesto, #lore, #tokenomics, #buy, #ca, #community { padding: 80px 30px; }
+  footer { padding: 30px; flex-direction: column; text-align: center; }
+  .foot-disclaimer { text-align: center; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero-content { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .manifesto-grid { grid-template-columns: 1fr; }
+  .token-grid { grid-template-columns: repeat(2,1fr); }
+  .steps { grid-template-columns: 1fr 1fr; }
+  #ca { padding: 80px 20px; }
+  .social-grid { flex-direction: column; align-items: center; }
+}
+@media (max-width: 480px) {
+  .token-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <img src="logo.png" alt="ScamBF" class="nav-logo-img">
+    <span class="nav-logo-text">$<span>Scam</span>BF</span>
+  </a>
+  <div class="nav-links">
+    <a href="#manifesto">Story</a>
+    <a href="#lore">Lore</a>
+    <a href="#tokenomics">Tokenomics</a>
+    <a href="#buy">Buy</a>
+    <a href="#community">Community</a>
+    <a href="https://x.com/i/communities/1991148046478954863" target="_blank" class="nav-btn">Join X Community</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-banner">
+    <img src="banner.png" alt="ScamBF Banner">
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-line"></span>
+        <span class="eyebrow-text">Born on Solana · After the Collapse</span>
+      </div>
+      <h1>
+        <span class="line1 glitch" data-text="SCAM">SCAM</span>
+        <span class="line2 glitch" data-text="BANKMAN">BANKMAN</span>
+        <span class="line3">FRIED</span>
+      </h1>
+      <p class="hero-desc">
+        When the biggest empire in crypto crumbled in a single night,
+        it wasn't just money that burned — it was trust, illusion, and the myth of invincibility.
+        From that ruin, $ScamBF was forged. Not as a joke. As a <strong style="color:var(--cream);">reckoning.</strong>
+      </p>
+      <div class="hero-btns">
+        <a href="https://scambfonsol.fun" target="_blank" class="btn-primary">Buy $ScamBF</a>
+        <a href="https://x.com/i/communities/1991148046478954863" target="_blank" class="btn-ghost">𝕏 Community</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-logo-wrap">
+        <div class="ring ring1"></div>
+        <div class="ring ring2"></div>
+        <div class="ring ring3"></div>
+        <div class="hero-logo-circle">
+          <img src="logo.png" alt="ScamBF Logo">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- MANIFESTO / THE STORY -->
+<section id="manifesto">
+  <div class="manifesto-grid">
+    <div class="manifesto-left fade-up">
+      <div class="section-label">The Reckoning</div>
+      <h2>WHEN THE<br><span class="hl">EMPIRE</span><br>FELL</h2>
+      <p class="manifesto-para">
+        November 2022. <strong>FTX</strong> — once the second-largest crypto exchange on earth — imploded overnight.
+        Billions vanished. Millions of users trapped, unable to withdraw. Sam Bankman-Fried,
+        the face of "<em>effective altruism</em>" and Wall Street crypto credibility, was exposed
+        as nothing more than the architect of the largest fraud in crypto history.
+      </p>
+      <p class="manifesto-para">
+        As Binance stepped back from a rescue deal and the red candles carved through every chart,
+        a generation of believers watched their trust <em>evaporate in real time.</em>
+        The promises were hollow. The math never added up. The emperor had no clothes.
+      </p>
+      <p class="manifesto-para">
+        But markets don't end. Communities don't die. From the wreckage,
+        the real survivors emerged — <strong>those who never trusted the suit.</strong>
+        Those who always knew: <strong>not your keys, not your coins.</strong>
+      </p>
+      <p class="manifesto-para">
+        $ScamBF is that memory. A perpetual monument to the collapse that changed everything.
+        A community built not on false promises, but on the <strong>shared scar</strong> of having survived it.
+      </p>
+    </div>
+
+    <div class="manifesto-right fade-up fade-up-d2">
+      <!-- Timeline -->
+      <div class="section-label">Timeline of Collapse</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-line"></div>
+          <div class="tl-dot red"></div>
+          <div class="tl-date">NOV<br>'22</div>
+          <div class="tl-body">
+            <div class="tl-title">CoinDesk Report Drops</div>
+            <div class="tl-desc">Alameda Research's balance sheet leaked — mostly FTT tokens, not real assets. The crack begins.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"></div>
+          <div class="tl-dot red"></div>
+          <div class="tl-date">NOV 8<br>'22</div>
+          <div class="tl-body">
+            <div class="tl-title">Binance Walks Away</div>
+            <div class="tl-desc">CZ signals Binance will sell its FTT holdings. Bank run begins. $6B withdrawn in 72 hours.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"></div>
+          <div class="tl-dot red"></div>
+          <div class="tl-date">NOV 11<br>'22</div>
+          <div class="tl-body">
+            <div class="tl-title">FTX Files Bankruptcy</div>
+            <div class="tl-desc">$32B valuation gone. SBF resigns. Over 1 million creditors stranded worldwide.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"></div>
+          <div class="tl-dot blue"></div>
+          <div class="tl-date">2024</div>
+          <div class="tl-body">
+            <div class="tl-title">SBF Sentenced — 25 Years</div>
+            <div class="tl-desc">Justice served. The lore is written. The community remembers. $ScamBF is born.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot gold"></div>
+          <div class="tl-date">NOW</div>
+          <div class="tl-body">
+            <div class="tl-title">The Rebirth</div>
+            <div class="tl-desc">From the ashes, a memecoin that memorializes the chaos — and dares to rebuild trust on-chain.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini chart -->
+      <div class="chart-wrap" style="margin-top:32px;">
+        <div class="chart-header">
+          <span class="chart-title">FTT Price — Nov 2022</span>
+          <span class="chart-badge">-97% in 5 days</span>
+        </div>
+        <svg class="chart-svg" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="redFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(220,38,38,0.3)"/>
+              <stop offset="100%" stop-color="rgba(220,38,38,0)"/>
+            </linearGradient>
+            <linearGradient id="blueFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(59,130,246,0.25)"/>
+              <stop offset="100%" stop-color="rgba(59,130,246,0)"/>
+            </linearGradient>
+            <filter id="glw"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Grid -->
+          <line x1="0" y1="40" x2="500" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <line x1="0" y1="80" x2="500" y2="80" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <!-- Crash path -->
+          <path d="M0,20 L60,18 L100,22 L140,25 L180,28 L220,80 L260,130 L300,145 L340,148 L500,150" fill="none" stroke="#dc2626" stroke-width="2" filter="url(#glw)" stroke-dasharray="700" stroke-dashoffset="700">
+            <animate attributeName="stroke-dashoffset" from="700" to="0" dur="2s" begin="0.5s" fill="freeze"/>
+          </path>
+          <!-- Fill under crash -->
+          <path d="M0,20 L60,18 L100,22 L140,25 L180,28 L220,80 L260,130 L300,145 L340,148 L500,150 L500,160 L0,160 Z" fill="url(#redFill)" opacity="0.5"/>
+          <!-- Recovery line -->
+          <path d="M340,148 L380,140 L420,125 L460,105 L500,80" fill="none" stroke="#3b82f6" stroke-width="2" filter="url(#glw)" stroke-dasharray="200" stroke-dashoffset="200">
+            <animate attributeName="stroke-dashoffset" from="200" to="0" dur="1.2s" begin="2.8s" fill="freeze"/>
+          </path>
+          <path d="M340,148 L380,140 L420,125 L460,105 L500,80 L500,160 L340,160 Z" fill="url(#blueFill)" opacity="0.5"/>
+          <!-- Labels -->
+          <text x="30" y="14" font-family="'Space Mono'" font-size="9" fill="rgba(220,38,38,0.7)">ATH</text>
+          <text x="220" y="76" font-family="'Space Mono'" font-size="8" fill="rgba(220,38,38,0.6)">NOV 8</text>
+          <text x="455" y="76" font-family="'Space Mono'" font-size="8" fill="rgba(59,130,246,0.7)">REBIRTH</text>
+          <line x1="230" y1="80" x2="230" y2="155" stroke="rgba(220,38,38,0.15)" stroke-width="1" stroke-dasharray="3,3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- LORE -->
+<section id="lore">
+  <div class="lore-bg-text">SURVIVE</div>
+  <div class="section-label ctr fade-up" style="margin-bottom:32px;">The Lore</div>
+  <div class="lore-quote fade-up fade-up-d1">
+    <span class="lore-quote-mark">"</span>
+    <p class="lore-text">
+      When giants fell, <accent-red class="accent-red">the illusion burned.</accent-red><br>
+      FTX collapsed in flames — trust shattered,<br>
+      markets bled, and even Binance cast its shadow over the chaos.<br><br>
+      <accent-blue class="accent-blue">Red lines carved the sky,</accent-blue>
+      marking the end of an era<br>
+      built on fragile promises and borrowed time.<br><br>
+      From the ashes, a new force emerged —<br>
+      not born from <accent-red class="accent-red">hype</accent-red>, but from
+      <accent-blue class="accent-blue">survival.</accent-blue><br>
+      Not from marketing, but from <accent-gold class="accent-gold">memory.</accent-gold><br><br>
+      No lies. No hidden games. No suits, no CEOs.<br>
+      Just <accent-blue class="accent-blue">code</accent-blue>,
+      <accent-gold class="accent-gold">community</accent-gold>, and
+      <accent-red class="accent-red">truth.</accent-red>
+    </p>
+  </div>
+
+  <div class="pillars fade-up fade-up-d2">
+    <div class="pillar">
+      <div class="pillar-icon">⛓️</div>
+      <span class="pillar-name">On-Chain</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">🤝</div>
+      <span class="pillar-name">Community</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">🔍</div>
+      <span class="pillar-name">Truth</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">🔥</div>
+      <span class="pillar-name">Survival</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">🛡️</div>
+      <span class="pillar-name">Never Again</span>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- TOKENOMICS -->
+<section id="tokenomics">
+  <div class="section-label ctr fade-up">Tokenomics</div>
+  <h2 class="fade-up" style="text-align:center;">BUILT FOR<br><span class="hlb">THE PEOPLE</span></h2>
+  <div class="token-grid fade-up fade-up-d1">
+    <div class="token-card">
+      <span class="token-num">1B</span>
+      <span class="token-lbl">Total Supply</span>
+      <span class="token-desc">Fixed forever. No minting, no inflation. What exists is all that will ever exist.</span>
+    </div>
+    <div class="token-card">
+      <span class="token-num">0%</span>
+      <span class="token-lbl">Team Allocation</span>
+      <span class="token-desc">No insider bags. No VC pre-sale. No locked team tokens waiting to dump on you.</span>
+    </div>
+    <div class="token-card">
+      <span class="token-num">0%</span>
+      <span class="token-lbl">Dev Tax</span>
+      <span class="token-desc">Zero buy/sell tax. No hidden fees bleeding your position. Pure transparency.</span>
+    </div>
+    <div class="token-card">
+      <span class="token-num">100%</span>
+      <span class="token-lbl">Community Owned</span>
+      <span class="token-desc">LP burned. Contract renounced. The power belongs to the holders — always.</span>
+    </div>
+    <div class="token-card">
+      <span class="token-num">SOL</span>
+      <span class="token-lbl">Network</span>
+      <span class="token-desc">Built on Solana — fast, cheap, and battle-tested through every storm. The real survivor chain.</span>
+    </div>
+    <div class="token-card">
+      <span class="token-num">🔒</span>
+      <span class="token-lbl">LP Locked</span>
+      <span class="token-desc">Liquidity is locked permanently. No rug. No exit. Just the mission and the community.</span>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- HOW TO BUY -->
+<section id="buy">
+  <div class="section-label ctr fade-up">Join the Mission</div>
+  <h2 class="fade-up" style="text-align:center;">HOW TO<br><span class="hl">GET IN</span></h2>
+  <div class="steps fade-up fade-up-d1">
+    <div class="step">
+      <span class="step-num">01</span>
+      <span class="step-icon">👜</span>
+      <div class="step-title">Get a Wallet</div>
+      <p class="step-text">Download Phantom or Solflare. Create your wallet and store your seed phrase somewhere safe — offline, never in a screenshot.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <span class="step-icon">◎</span>
+      <div class="step-title">Get SOL</div>
+      <p class="step-text">Purchase SOL from any major exchange (Binance, Coinbase, Kraken) and send it to your Solana wallet address.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <span class="step-icon">🔄</span>
+      <div class="step-title">Swap on Pump.fun</div>
+      <p class="step-text">Head to pump.fun, paste the $ScamBF contract address, and swap your SOL. Set slippage to 1-5% for smooth execution.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <span class="step-icon">🔥</span>
+      <div class="step-title">Survive & Thrive</div>
+      <p class="step-text">You're a survivor now. Join the X community, spread the lore, and be part of the movement that never forgets.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CA -->
+<section id="ca">
+  <div class="section-label ctr fade-up">Contract</div>
+  <h2 class="fade-up" style="text-align:center;">CONTRACT<br><span class="hlb">ADDRESS</span></h2>
+  <div class="ca-wrap fade-up fade-up-d1">
+    <div class="ca-box">
+      <span class="ca-icon">◎</span>
+      <span class="ca-text" id="ca-addr">TBA — Launching soon on Pump.fun</span>
+      <button class="ca-copy" onclick="copyCa()">COPY</button>
+    </div>
+    <p class="ca-note">Always verify the contract address on official channels before buying</p>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- COMMUNITY -->
+<section id="community">
+  <div class="community-glow"></div>
+  <div class="section-label ctr fade-up">Community</div>
+  <h2 class="fade-up" style="text-align:center;">JOIN THE<br><span class="hl">SURVIVORS</span></h2>
+  <p class="community-sub fade-up fade-up-d1">
+    The community IS the product. The truth IS the brand.
+    We don't need a CEO — we have each other.
+  </p>
+  <div class="social-grid fade-up fade-up-d2">
+    <a href="https://x.com/i/communities/1991148046478954863" target="_blank" class="social-btn social-x">
+      𝕏 &nbsp;Community on X
+    </a>
+    <a href="https://scambfonsol.fun" target="_blank" class="social-btn social-web">
+      🌐 &nbsp;scambfonsol.fun
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">
+    <img src="logo.png" alt="ScamBF">
+    <span class="foot-logo-text">$SCAMBF · SOLANA</span>
+  </div>
+  <p class="foot-disclaimer">
+    $ScamBF is a memecoin created for entertainment and community purposes only.
+    This is not financial advice. Cryptocurrency assets are highly speculative and volatile.
+    Never invest more than you can afford to lose. DYOR — Do Your Own Research.
+  </p>
+</footer>
+
+<script>
+/* ── PARTICLE CANVAS ── */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = (Math.random() - 0.5) * 0.3;
+    this.alpha = Math.random() * 0.4 + 0.05;
+    this.color = Math.random() > 0.7 ? '#3b82f6' : Math.random() > 0.5 ? '#dc2626' : '#ffffff';
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+function animateParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* ── NAV SCROLL ── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+/* ── FADE IN ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+/* ── COPY CA ── */
+function copyCa() {
+  const addr = document.getElementById('ca-addr').textContent;
+  navigator.clipboard.writeText(addr).catch(() => {});
+  const btn = document.querySelector('.ca-copy');
+  btn.textContent = 'COPIED ✓';
+  btn.style.background = '#10b981';
+  btn.style.color = '#fff';
+  setTimeout(() => {
+    btn.textContent = 'COPY';
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 2500);
+}
+
+/* ── SMOOTH SCROLL ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+/* ── GRID LINES ── */
+(function drawGrid() {
+  const overlay = document.createElement('canvas');
+  overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.025';
+  document.body.appendChild(overlay);
+  const g = overlay.getContext('2d');
+  function renderGrid() {
+    overlay.width = window.innerWidth;
+    overlay.height = window.innerHeight;
+    g.strokeStyle = '#3b82f6';
+    g.lineWidth = 0.5;
+    for (let x = 0; x < overlay.width; x += 80) {
+      g.beginPath(); g.moveTo(x, 0); g.lineTo(x, overlay.height); g.stroke();
+    }
+    for (let y = 0; y < overlay.height; y += 80) {
+      g.beginPath(); g.moveTo(0, y); g.lineTo(overlay.width, y); g.stroke();
+    }
+  }
+  renderGrid();
+  window.addEventListener('resize', renderGrid);
+})();
+</script>
+</body>
+</html>
